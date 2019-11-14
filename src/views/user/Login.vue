@@ -42,7 +42,8 @@
               </a-form-item>
             </a-col>
             <a-col  :span="10">
-              <j-graphic-code @success="generateCode" style="float: right"></j-graphic-code>
+              <!-- <j-graphic-code @success="generateCode" style="float: right"></j-graphic-code> -->
+              <c-graphic-code :source="graphicSource" style="float: right"></c-graphic-code>
             </a-col>
           </a-row>
 
@@ -165,7 +166,7 @@
 </template>
 
 <script>
-  //import md5 from "md5"
+  import md5 from "md5"
   import api from '@/api'
   import TwoStepCaptcha from '@/components/tools/TwoStepCaptcha'
   import { mapActions } from "vuex"
@@ -173,8 +174,10 @@
   import Vue from 'vue'
   import { ACCESS_TOKEN ,ENCRYPTED_STRING} from "@/store/mutation-types"
   import JGraphicCode from '@/components/jeecg/JGraphicCode'
+  import CGraphicCode from '@/components/cake/CGraphicCode'
   import { putAction } from '@/api/manage'
   import { postAction } from '@/api/manage'
+  import { getGraphicCode } from '@/api/system'
   import { encryption , getEncryptedString } from '@/utils/encryption/aesEncrypt'
   import store from '@/store/'
   import { USER_INFO } from "@/store/mutation-types"
@@ -182,7 +185,8 @@
   export default {
     components: {
       TwoStepCaptcha,
-      JGraphicCode
+      JGraphicCode,
+      CGraphicCode
     },
     data () {
       return {
@@ -223,7 +227,9 @@
         departVisible:false,
         departSelected:"",
         currentUsername:"",
-        validate_status:""
+        validate_status:"",
+
+        graphicSource: getGraphicCode
       }
     },
     created () {
@@ -270,10 +276,8 @@
                 this.departConfirm(res)
               }).catch((err) => {
                 that.requestFailed(err);
-              });
-
-
-            }else {
+              })
+            } else {
               that.loginBtn = false;
             }
           })
