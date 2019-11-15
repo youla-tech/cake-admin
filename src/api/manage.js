@@ -1,6 +1,6 @@
-import {
-  axios
-} from '@/utils/request'
+import qs from 'qs'
+import { axios } from '@/utils/request'
+import envConfig from '@/config/env.config'
 
 const api = {
   user: '/api/user',
@@ -112,4 +112,10 @@ export function downFile(url, parameter = {}) {
     method: 'get',
     responseType: 'blob'
   })
+}
+
+export function getRequestUrl (url, parameter = {}) {
+  const isProduct = process.env.NODE_ENV !== 'development'
+  const requestBaseUrl = !isProduct ? envConfig.dev.baseApi : envConfig.prod.baseApi
+  return requestBaseUrl + url + (qs.stringify(parameter) && ('?' + qs.stringify(parameter)))
 }
