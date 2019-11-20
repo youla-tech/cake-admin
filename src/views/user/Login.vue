@@ -31,54 +31,17 @@
             <a-col :span="14">
               <a-form-item>
                 <a-input
-                  v-decorator="['inputCode',validatorRules.inputCode]"
-                  size="large"
-                  type="text"
-                  @change="inputCodeChange"
-                  placeholder="请输入验证码">
-                  <a-icon slot="prefix" v-if=" inputCodeContent==verifiedCode " type="smile" :style="{ color: 'rgba(0,0,0,.25)' }"/>
-                  <a-icon slot="prefix" v-else type="frown" :style="{ color: 'rgba(0,0,0,.25)' }"/>
-                </a-input>
-              </a-form-item>
-            </a-col>
-            <a-col  :span="10">
-              <!-- <j-graphic-code @success="generateCode" style="float: right"></j-graphic-code> -->
-              <c-graphic-code :source="graphicSource" style="float: right"></c-graphic-code>
-            </a-col>
-          </a-row>
-
-
-        </a-tab-pane>
-        <a-tab-pane key="tab2" tab="手机号登陆">
-          <a-form-item>
-            <a-input
-              v-decorator="['mobile',validatorRules.mobile]"
-              size="large"
-              type="text"
-              placeholder="手机号">
-              <a-icon slot="prefix" type="mobile" :style="{ color: 'rgba(0,0,0,.25)' }"/>
-            </a-input>
-          </a-form-item>
-
-          <a-row :gutter="16">
-            <a-col class="gutter-row" :span="16">
-              <a-form-item>
-                <a-input
                   v-decorator="['captcha',validatorRules.captcha]"
                   size="large"
                   type="text"
                   placeholder="请输入验证码">
-                  <a-icon slot="prefix" type="mail" :style="{ color: 'rgba(0,0,0,.25)' }"/>
+                  <!-- <a-icon slot="prefix" v-if=" inputCodeContent==verifiedCode " type="smile" :style="{ color: 'rgba(0,0,0,.25)' }"/> -->
+                  <!-- <a-icon slot="prefix" v-else type="frown" :style="{ color: 'rgba(0,0,0,.25)' }"/> -->
                 </a-input>
               </a-form-item>
             </a-col>
-            <a-col class="gutter-row" :span="8">
-              <a-button
-                class="getCaptcha"
-                tabindex="-1"
-                :disabled="state.smsSendBtn"
-                @click.stop.prevent="getCaptcha"
-                v-text="!state.smsSendBtn && '获取验证码' || (state.time+' s')"></a-button>
+            <a-col  :span="10">
+              <c-graphic-code :source="graphicSource" style="float: right"></c-graphic-code>
             </a-col>
           </a-row>
         </a-tab-pane>
@@ -86,12 +49,6 @@
 
       <a-form-item>
         <a-checkbox v-model="formLogin.rememberMe">自动登陆</a-checkbox>
-  <!--      <router-link :to="{ name: 'alteration'}" class="forge-password" style="float: right;">
-          忘记密码
-        </router-link>
-        <router-link :to="{ name: 'register'}" class="forge-password" style="float: right;margin-right: 10px" >
-          注册账户
-        </router-link>-->
       </a-form-item>
 
       <a-form-item style="margin-top:24px">
@@ -105,63 +62,7 @@
           :disabled="loginBtn">确定
         </a-button>
       </a-form-item>
-
-      <!-- <div class="user-login-other">
-        <span>其他登陆方式</span>
-        <a><a-icon class="item-icon" type="alipay-circle"></a-icon></a>
-        <a><a-icon class="item-icon" type="taobao-circle"></a-icon></a>
-        <a><a-icon class="item-icon" type="weibo-circle"></a-icon></a>
-        <router-link class="register" :to="{ name: 'register' }">
-          注册账户
-        </router-link>
-      </div>-->
     </a-form>
-
-    <two-step-captcha
-      v-if="requiredTwoStepCaptcha"
-      :visible="stepCaptchaVisible"
-      @success="stepCaptchaSuccess"
-      @cancel="stepCaptchaCancel"></two-step-captcha>
-
-    <a-modal
-      title="登录部门选择"
-      :width="450"
-      :visible="departVisible"
-      :closable="false"
-      :maskClosable="false">
-
-      <template slot="footer">
-        <a-button type="primary" @click="departOk">确认</a-button>
-      </template>
-
-      <a-form>
-        <a-form-item
-          :labelCol="{span:4}"
-          :wrapperCol="{span:20}"
-          style="margin-bottom:10px"
-          :validate-status="validate_status">
-          <a-tooltip placement="topLeft" >
-            <template slot="title">
-              <span>您隶属于多部门，请选择登录部门</span>
-            </template>
-            <a-avatar style="backgroundColor:#87d068" icon="gold" />
-          </a-tooltip>
-          <a-select @change="departChange" :class="{'valid-error':validate_status=='error'}" placeholder="请选择登录部门" style="margin-left:10px;width: 80%">
-            <a-icon slot="suffixIcon" type="gold" />
-            <a-select-option
-              v-for="d in departList"
-              :key="d.id"
-              :value="d.orgCode">
-              {{ d.departName }}
-            </a-select-option>
-          </a-select>
-        </a-form-item>
-      </a-form>
-
-
-
-    </a-modal>
-
   </div>
 </template>
 
@@ -263,15 +164,11 @@ export default {
       that.loginBtn = true;
       // 使用账户密码登陆
       if (that.customActiveKey === 'tab1') {
-        that.form.validateFields([ 'username', 'password','inputCode' ], { force: true }, (err, values) => {
+        that.form.validateFields([ 'username', 'password','captcha' ], { force: true }, (err, values) => {
           if (!err) {
             loginParams.username = values.username
-            // update-begin- --- author:scott ------ date:20190805 ---- for:密码加密逻辑暂时注释掉，有点问题
-            //loginParams.password = md5(values.password)
-            //loginParams.password = encryption(values.password,that.encryptedString.key,that.encryptedString.iv)
-            // loginParams.password = values.password
-            // update-begin- --- author:scott ------ date:20190805 ---- for:密码加密逻辑暂时注释掉，有点问题
             loginParams.password = md5(values.password)
+            loginParams.captcha = values.captcha
             that.Login(loginParams).then((res) => {
               this.departConfirm(res)
             }).catch((err) => {
@@ -279,21 +176,6 @@ export default {
             })
           } else {
             that.loginBtn = false;
-          }
-        })
-        // 使用手机号登陆
-      } else {
-        that.form.validateFields([ 'mobile', 'captcha' ], { force: true }, (err, values) => {
-          if (!err) {
-            loginParams.mobile = values.mobile
-            loginParams.captcha = values.captcha
-            that.PhoneLogin(loginParams).then((res) => {
-              console.log(res.result);
-              this.departConfirm(res)
-            }).catch((err) => {
-              that.requestFailed(err);
-            })
-
           }
         })
       }
