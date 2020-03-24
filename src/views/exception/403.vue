@@ -3,13 +3,13 @@
 </template>
 
 <script>
-  import ExceptionPage from './ExceptionPage'
+import { ExceptionPage } from '@/components'
 
-  export default {
-    components: {
-      ExceptionPage
-    }
+export default {
+  components: {
+    ExceptionPage
   }
+}
 </script>
 
 <style scoped>

@@ -5,7 +5,8 @@
     :visible="visible"
     @ok="handleOk"
     @cancel="handleCancel"
-    cancelText="关闭">
+    cancelText="关闭"
+  >
 
     <div class="table-page-search-wrapper">
       <a-form layout="inline">
@@ -52,13 +53,13 @@
             </a-col>
           </template>
 
-          <a-col :span="6" >
+          <a-col :span="6">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchByquery" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
               <a @click="handleToggleSearch" style="margin-left: 8px">
                 {{ toggleSearchStatus ? '收起' : '展开' }}
-                <a-icon :type="toggleSearchStatus ? 'up' : 'down'"/>
+                <a-icon :type="toggleSearchStatus ? 'up' : 'down'" />
               </a>
             </span>
           </a-col>
@@ -76,196 +77,187 @@
       :rowSelection="{selectedRowKeys: selectedRowKeys, onChange: onSelectChange}"
       @change="handleTableChange"
     >
-
     </a-table>
   </a-modal>
 </template>
 
 <script>
-  import { filterObj } from '@/utils/util';
-
-  import { getUserList } from '@/api/api'
+  import { filterObj } from '@/utils/util'
+  import { getUserList } from '@/api/system'
 
   export default {
-    name: "SelectUserListModal",
-    components: {
-    },
+    name: 'SelectUserListModal',
     data () {
       return {
-        title:"选择用户",
+        title: '选择用户',
         queryParam: {},
         columns: [{
           title: '用户账号',
-          align:"center",
+          align: 'center',
           dataIndex: 'username',
-          fixed:'left',
-          width:200
-        },{
+          fixed: 'left',
+          width: 200
+        }, {
           title: '真实姓名',
-          align:"center",
+          align: 'center',
           dataIndex: 'realname',
-        },{
+        }, {
           title: '性别',
-          align:"center",
+          align: 'center',
           dataIndex: 'sex',
-          customRender:function (text) {
-            if(text==1){
-              return "男";
-            }else if(text==2){
-              return "女";
-            }else{
-              return text;
-            }
+          customRender: function (text) {
+            return ['', '男', '女'][text] || text
           }
-        },{
+        }, {
           title: '手机号码',
-          align:"center",
+          align: 'center',
           dataIndex: 'phone'
-        },{
+        }, {
           title: '邮箱',
-          align:"center",
+          align: 'center',
           dataIndex: 'email'
-        },{
+        }, {
           title: '状态',
-          align:"center",
+          align: 'center',
           dataIndex: 'status',
-          customRender:function (text) {
-            if(text==1){
-              return "正常";
-            }else if(text==2){
-              return "冻结";
-            }else{
-              return text;
-            }
+          customRender (text) {
+            return ['', '正常', '冻结'][text] || text
           }
         }],
-        dataSource:[],
-        ipagination:{
+        dataSource: [],
+        ipagination: {
           current: 1,
           pageSize: 5,
           pageSizeOptions: ['5', '10', '20'],
           showTotal: (total, range) => {
-            return range[0] + "-" + range[1] + " 共" + total + "条"
+            return range[0] + '-' + range[1] + ' 共' + total + '条'
           },
           showQuickJumper: true,
           showSizeChanger: true,
           total: 0
         },
-        isorter:{
+        isorter: {
           column: 'createTime',
           order: 'desc',
         },
         selectedRowKeys: [],
         selectionRows: [],
-        visible:false,
-        toggleSearchStatus:false,
+        visible: false,
+        toggleSearchStatus: false,
       }
     },
-    created() {
-      this.loadData();
+    created () {
+      this.loadData()
     },
     methods: {
-      add (selectUser,userIds) {
-        this.visible = true;
-        this.edit(selectUser,userIds);
+      add (selectUser, userIds) {
+        this.visible = true
+        this.edit(selectUser, userIds)
       },
-      edit(selectUser,userIds){
-        if(!userIds){
-          this.selectedRowKeys = []
-        }else{
-          this.selectedRowKeys = userIds.split(',');
-        }
-        if(!selectUser){
-          this.selectionRows=[]
-        }else{
-          this.selectionRows = selectUser;
-        }
+      edit (selectUser, userIds) {
+        this.selectedRowKeys = (!userIds || !userIds.length) ? [] : userIds.split(',')
+        this.selectionRows = !selectUser ? [] : selectUser
       },
-      loadData (arg){
-        if(arg===1){
-          this.ipagination.current = 1;
+      loadData (arg) {
+        if (arg === 1) {
+          this.ipagination.current = 1
         }
-        let params = this.getQueryParams();//查询条件
-        getUserList(params).then((res)=>{
-          if(res.success){
-            this.dataSource = res.result.records;
-            this.ipagination.total = res.result.total;
+        let params = this.getQueryParams() //查询条件
+        getUserList(params).then((res) => {
+          if (res.success) {
+            this.dataSource = res.result.records
+            this.ipagination.total = res.result.total
           }
         })
       },
-      getQueryParams(){
-        let param = Object.assign({}, this.queryParam,this.isorter);
-        param.field = this.getQueryField();
-        //--update-begin----author:scott---date:20190818------for:新建公告时指定特定用户翻页错误SelectUserListModal #379----
-        // param.current = this.ipagination.current;
-        // param.pageSize = this.ipagination.pageSize;
-        param.pageNo = this.ipagination.current;
-        param.pageSize = this.ipagination.pageSize;
-        //--update-end----author:scott---date:20190818------for:新建公告时指定特定用户翻页错误SelectUserListModal #379---
-        return filterObj(param);
+      getQueryParams () {
+        let param = Object.assign({}, this.queryParam, this.isorter)
+        param.field = this.getQueryField()
+        param.pageNo = this.ipagination.current
+        param.pageSize = this.ipagination.pageSize
+        return filterObj(param)
       },
-      getQueryField(){
-        let str = "id,";
-        for(let a = 0;a<this.columns.length;a++){
-          str+=","+this.columns[a].dataIndex;
+      getQueryField () {
+        let str = 'id,'
+        for (let a = 0; a < this.columns.length; a++) {
+          str += ',' + this.columns[a].dataIndex
         }
-        return str;
+        return str
       },
-      onSelectChange (selectedRowKeys,selectionRows) {
-        this.selectedRowKeys = selectedRowKeys;
-        console.log(this.selectedRowKeys);
-        this.selectionRows = selectionRows;
+      onSelectChange (selectedRowKeys, selectionRows) {
+        this.selectedRowKeys = selectedRowKeys
+        this.selectionRows = selectionRows
       },
-      searchReset(){
-        let that = this;
-        Object.keys(that.queryParam).forEach(function(key){
-          that.queryParam[key] = '';
-        });
-        that.loadData(1);
+      searchReset () {
+        Object.keys(this.queryParam).forEach((key) => {
+          this.queryParam[key] = ''
+        })
+        this.loadData(1)
       },
-      handleTableChange(pagination, filters, sorter){
-        //TODO 筛选
-        if (Object.keys(sorter).length>0){
-          this.isorter.column = sorter.field;
-          this.isorter.order = "ascend"==sorter.order?"asc":"desc"
+      handleTableChange (pagination, filters, sorter) {
+        if (Object.keys(sorter).length > 0) {
+          this.isorter.column = sorter.field
+          this.isorter.order = 'ascend' == sorter.order ? 'asc' : 'desc'
         }
-        this.ipagination = pagination;
-        this.loadData();
+        this.ipagination = pagination
+        this.loadData()
       },
       handleCancel () {
-        this.selectionRows = [];
-        this.selectedRowKeys = [];
-        this.visible = false;
+        this.selectionRows = []
+        this.selectedRowKeys = []
+        this.visible = false
       },
       handleOk () {
-        this.$emit("choseUser",this.selectionRows);
-        this.handleCancel();
+        this.$emit('choseUser', this.selectionRows)
+        this.handleCancel()
       },
-      searchByquery(){
-        this.loadData(1);
+      searchByquery () {
+        this.loadData(1)
       },
-      handleToggleSearch(){
-        this.toggleSearchStatus = !this.toggleSearchStatus;
+      handleToggleSearch () {
+        this.toggleSearchStatus = !this.toggleSearchStatus
       },
     }
   }
 </script>
 <style scoped>
-  .ant-card-body .table-operator{
+  .ant-card-body .table-operator {
     margin-bottom: 18px;
   }
 
-  .ant-table-tbody .ant-table-row td{
-    padding-top:15px;
-    padding-bottom:15px;
+  .ant-table-tbody .ant-table-row td {
+    padding-top: 15px;
+    padding-bottom: 15px;
   }
-  .anty-row-operator button{margin: 0 5px}
-  .ant-btn-danger{background-color: #ffffff}
 
-  .ant-modal-cust-warp{height: 100%}
-  .ant-modal-cust-warp .ant-modal-body{height:calc(100% - 110px) !important;overflow-y: auto}
-  .ant-modal-cust-warp .ant-modal-content{height:90% !important;overflow-y: hidden}
+  .anty-row-operator button {
+    margin: 0 5px
+  }
 
-  .anty-img-wrap{height:25px;position: relative;}
-  .anty-img-wrap > img{max-height:100%;}
+  .ant-btn-danger {
+    background-color: #ffffff
+  }
+
+  .ant-modal-cust-warp {
+    height: 100%
+  }
+
+  .ant-modal-cust-warp .ant-modal-body {
+    height: calc(100% - 110px) !important;
+    overflow-y: auto
+  }
+
+  .ant-modal-cust-warp .ant-modal-content {
+    height: 90% !important;
+    overflow-y: hidden
+  }
+
+  .anty-img-wrap {
+    height: 25px;
+    position: relative;
+  }
+
+  .anty-img-wrap>img {
+    max-height: 100%;
+  }
 </style>

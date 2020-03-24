@@ -4,8 +4,11 @@ function resolve(dir) {
   return path.join(__dirname, dir)
 }
 
+const isProEnv = process.env.NODE_ENV === 'production'
+
 // vue.config.js
 module.exports = {
+  publicPath: isProEnv ? './' : '/',
   /*
     Vue-cli3:
     Crashed when using Webpack `import()` #2463
@@ -13,14 +16,6 @@ module.exports = {
    */
   // 如果你不需要生产环境的 source map，可以将其设置为 false 以加速生产环境构建。
   productionSourceMap: false,
-  /*
-  pages: {
-    index: {
-      entry: 'src/main.js',
-      chunks: ['chunk-vendors', 'chunk-common', 'index']
-    }
-  },
-  */
   configureWebpack: config => {
     //生产环境取消 console.log
     if (process.env.NODE_ENV === 'production') {
@@ -32,9 +27,9 @@ module.exports = {
       .set('@$', resolve('src'))
       .set('@api', resolve('src/api'))
       .set('@assets', resolve('src/assets'))
-      .set('@comp', resolve('src/components'))
+      .set('@components', resolve('src/components'))
       .set('@views', resolve('src/views'))
-      .set('@layout', resolve('src/layout'))
+      .set('@layout', resolve('src/components/Layouts'))
       .set('@static', resolve('src/static'))
   },
 
@@ -56,23 +51,20 @@ module.exports = {
   },
 
   devServer: {
-    port: 3000,
+    port: 3001,
     proxy: {
-     /* '/api': {
-        target: 'https://mock.ihx.me/mock/5baf3052f7da7e07e04a5116/antd-pro', //mock API接口系统
+     '/pro': {
+        // target: 'http://yapi.demo.qunar.com/mock/66959', //mock API接口系统
+        // target: 'https://aliiot.on-bright.com/mock/13/pro',
+        target: 'http://localhost:9100',
         ws: false,
         changeOrigin: true,
         pathRewrite: {
-          '/jeecg-boot': ''  //默认所有请求都加了jeecg-boot前缀，需要去掉
+          '/pro': ''  //默认所有请求都加了/pro前缀，需要去掉
         }
-      },*/
-      '/jeecg-boot': {
-        target: 'http://localhost:9000', //请求本地 需要jeecg-boot后台项目
-        ws: false,
-        changeOrigin: true
       },
     }
   },
 
-  lintOnSave: undefined
+  lintOnSave: true
 }

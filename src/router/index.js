@@ -1,12 +1,26 @@
 import Vue from 'vue'
-import Router from 'vue-router'
+import VueRouter from 'vue-router'
+
 import { constantRouterMap } from '@/config/router.config'
+// import { isProEnv } from "@/config/env.config"
+import { initRouteHook } from "./hook"
 
-Vue.use(Router)
+// hack router push callback --- NavigationDuplicated
+const originalPush = VueRouter.prototype.push
+VueRouter.prototype.push = function push (location, onResolve, onReject) {
+  if (onResolve || onReject) return originalPush.call(this, location, onResolve, onReject)
+  return originalPush.call(this, location).catch(err => err)
+}
 
-export default new Router({
-  mode: 'history',
-  base: process.env.BASE_URL,
+Vue.use(VueRouter)
+
+const router = new VueRouter({
+  mode: 'hash',
+  // base: isProEnv() ? 'pro' : '/',
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRouterMap
 })
+// Router Controller
+initRouteHook(router)
+
+export default router

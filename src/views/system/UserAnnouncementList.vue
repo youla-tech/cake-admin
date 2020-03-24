@@ -7,7 +7,7 @@
 
           <a-col :span="6">
             <a-form-item label="标题">
-              <a-input placeholder="请输入标题" v-model="queryParam.titile"></a-input>
+              <a-input placeholder="请输入标题" v-model="queryParam.title"></a-input>
             </a-form-item>
           </a-col>
           <a-col :span="6">
@@ -16,7 +16,7 @@
             </a-form-item>
           </a-col>
 
-          <a-col :span="8" >
+          <a-col :span="8">
             <span style="float: left;overflow: hidden;" class="table-page-search-submitButtons">
               <a-button type="primary" @click="searchQuery" icon="search">查询</a-button>
               <a-button type="primary" @click="searchReset" icon="reload" style="margin-left: 8px">重置</a-button>
@@ -40,7 +40,8 @@
       :dataSource="dataSource"
       :pagination="ipagination"
       :loading="loading"
-      @change="handleTableChange">
+      @change="handleTableChange"
+    >
       <span slot="action" slot-scope="text, record">
         <a @click="showAnnouncement(record)">查看</a>
       </span>
@@ -50,14 +51,13 @@
 </template>
 
 <script>
-  import { filterObj } from '@/utils/util'
-  import { getAction,putAction } from '@/api/manage'
+  import { putAction } from '@/utils/ajax'
   import ShowAnnouncement from '@/components/tools/ShowAnnouncement'
-  import {JeecgListMixin} from '@/mixins/JeecgListMixin'
+  import { ProListMixin } from '@/utils/mixins/ProListMixin'
 
   export default {
-    name: "UserAnnouncementList",
-    mixins: [JeecgListMixin],
+    name: 'UserAnnouncementList',
+    mixins: [ ProListMixin ],
     components: {
       ShowAnnouncement
     },
@@ -67,114 +67,121 @@
         queryParam: {},
         columns: [{
           title: '标题',
-          align:"center",
-          dataIndex: 'titile'
-        },{
+          align: 'center',
+          dataIndex: 'title'
+        }, {
           title: '消息类型',
-          align: "center",
+          align: 'center',
           dataIndex: 'msgCategory',
-          customRender: function (text) {
-            if (text == '1') {
-              return "通知公告";
-            } else if (text == "2") {
-              return "系统消息";
+          customRender(text) {
+            if (text === '1') {
+              return '通知公告'
+            } else if (text === '2') {
+              return '系统消息'
             } else {
-              return text;
+              return text
             }
           }
-        },{
+        }, {
           title: '发布人',
-          align:"center",
+          align: 'center',
           dataIndex: 'sender'
-        },{
+        }, {
           title: '发布时间',
-          align:"center",
+          align: 'center',
           dataIndex: 'sendTime'
-        },{
+        }, {
           title: '优先级',
-          align:"center",
+          align: 'center',
           dataIndex: 'priority',
-          customRender:function (text) {
-            if(text=='L'){
-              return "低";
-            }else if(text=="M"){
-              return "中";
-            }else if(text=="H"){
-              return "高";
-            } else {
-              return text;
-            }
+          customRender(text) {
+            return {
+              L: '低',
+              M: '中',
+              H: '高'
+            } [text] || text
           }
-        },{
+        }, {
           title: '阅读状态',
-          align:"center",
+          align: 'center',
           dataIndex: 'readFlag',
-          customRender:function (text) {
-            if(text=='0'){
-              return "未读";
-            }else if(text=="1"){
-              return "已读";
-            } else {
-              return text;
-            }
+          customRender(text) {
+            return ['未读', '已读'][text] || text
           }
-        },{
+        }, {
           title: '操作',
           dataIndex: 'action',
-          align:"center",
-          scopedSlots: { customRender: 'action' },
+          align: 'center',
+          scopedSlots: {
+            customRender: 'action'
+          },
         }],
-		    url: {
-          list: "/sys/sysAnnouncementSend/getMyAnnouncementSend",
-          editCementSend:"sys/sysAnnouncementSend/editByAnntIdAndUserId",
-          readAllMsg:"sys/sysAnnouncementSend/readAll",
+        url: {
+          list: '/sys/announcement/getMyAnnouncement',
+          editAnnouncement: '/sys/announcement/editByAnntIdAndUserId',
+          readAllMsg: '/sys/announcement/readAll',
         },
-        loading:false,
+        loading: false,
       }
     },
-    created() {
-      this.loadData();
+    created () {
+      this.loadData()
     },
     methods: {
-
-      handleDetail: function(record){
-        this.$refs.sysAnnouncementModal.detail(record);
-        this.$refs.sysAnnouncementModal.title="查看";
+      handleDetail (record){
+        this.$refs.sysAnnouncementModal.detail(record)
+        this.$refs.sysAnnouncementModal.title = '查看'
       },
-      showAnnouncement(record){
-        putAction(this.url.editCementSend,{anntId:record.anntId}).then((res)=>{
+      showAnnouncement (record){
+        putAction(this.url.editAnnouncement, {anntId: record.anntId}).then((res)=>{
           if(res.success){
-            this.loadData();
+            this.loadData()
           }
-        });
-        this.$refs.ShowAnnouncement.detail(record);
+        })
+        this.$refs.ShowAnnouncement.detail(record)
       },
-      readAll(){
-        var that = this;
+      readAll () {
+        const that = this
         that.$confirm({
-          title:"确认操作",
-          content:"是否全部标注已读?",
-          onOk: function(){
-            putAction(that.url.readAllMsg).then((res)=>{
-              if(res.success){
-                that.$message.success(res.message);
-                that.loadData();
+          title: '确认操作',
+          content: '是否全部标注已读?',
+          onOk() {
+            putAction(that.url.readAllMsg).then((res) => {
+              if (res.success) {
+                that.$message.success(res.message)
+                that.loadData()
               }
-            });
+            })
           }
-        });
+        })
       },
     }
   }
 </script>
 <style scoped>
-  .ant-card-body .table-operator{
-    margin-bottom: 18px;
-  }
-  .anty-row-operator button{margin: 0 5px}
-  .ant-btn-danger{background-color: #ffffff}z
+.ant-card-body .table-operator {
+  margin-bottom: 18px;
+}
 
-  .ant-modal-cust-warp{height: 100%}
-  .ant-modal-cust-warp .ant-modal-body{height:calc(100% - 110px) !important;overflow-y: auto}
-  .ant-modal-cust-warp .ant-modal-content{height:90% !important;overflow-y: hidden}
+.anty-row-operator button {
+  margin: 0 5px
+}
+
+.ant-btn-danger {
+  background-color: #ffffff
+}
+
+z .ant-modal-cust-warp {
+  height: 100%
+}
+
+.ant-modal-cust-warp .ant-modal-body {
+  height: calc(100% - 110px) !important;
+  overflow-y: auto
+}
+
+.ant-modal-cust-warp .ant-modal-content {
+  height: 90% !important;
+  overflow-y: hidden
+}
 </style>
