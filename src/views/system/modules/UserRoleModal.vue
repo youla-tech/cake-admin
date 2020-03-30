@@ -2,15 +2,16 @@
   <a-drawer
     :title="title"
     :maskClosable="true"
-    width=650
+    width="650"
     placement="right"
     :closable="true"
     @close="close"
     :visible="visible"
-    style="height: calc(100% - 55px);overflow: auto;padding-bottom: 53px;">
+    style="height: calc(100% - 55px);overflow: auto;padding-bottom: 53px;"
+  >
 
     <a-form>
-      <a-form-item label='所拥有的权限'>
+      <a-form-item label="所拥有的权限">
         <a-tree
           checkable
           @check="onCheck"
@@ -19,10 +20,12 @@
           @expand="onExpand"
           @select="onTreeNodeSelect"
           :expandedKeys="expandedKeysss"
-          :checkStrictly="checkStrictly">
-          <span slot="hasDatarule" slot-scope="{slotTitle,ruleFlag}">
-            {{ slotTitle }}<a-icon v-if="ruleFlag" type="align-left" style="margin-left:5px;color: red;"></a-icon>
-          </span>
+          :checkStrictly="checkStrictly"
+        >
+          <!-- <span slot="hasDatarule" slot-scope="{slotTitle,ruleFlag}">
+            {{ slotTitle }}
+            <a-icon v-if="ruleFlag" type="align-left" style="margin-left:5px;color: red;"></a-icon>
+          </span> -->
         </a-tree>
       </a-form-item>
     </a-form>
@@ -47,57 +50,48 @@
       <a-button @click="handleSubmit" type="primary" :loading="loading">提交</a-button>
     </div>
 
-    <role-datarule-modal ref="datarule"></role-datarule-modal>
-
   </a-drawer>
 
 </template>
 <script>
-  import {queryTreeListForRole,queryRolePermission,saveRolePermission} from '@/api/api'
-  import RoleDataruleModal from './RoleDataruleModal.vue'
+  import { queryPermissionTreeList, queryRolePermission, saveRolePermission } from '@/api/system'
 
   export default {
-    name: "RoleModal",
+    name: 'UserRoleModal',
     components:{
-      RoleDataruleModal
     },
-    data(){
+    data () {
       return {
-        roleId:"",
+        roleId: '',
         treeData: [],
-        defaultCheckedKeys:[],
-        checkedKeys:[],
-        expandedKeysss:[],
-        allTreeKeys:[],
+        defaultCheckedKeys: [],
+        checkedKeys: [],
+        expandedKeysss: [],
+        allTreeKeys: [],
         autoExpandParent: true,
         checkStrictly: true,
-        title:"角色权限配置",
+        title: '角色权限配置',
         visible: false,
         loading: false,
       }
     },
     methods: {
-      onTreeNodeSelect(id){
-        this.$refs.datarule.show(id[0],this.roleId)
+      onTreeNodeSelect () {
       },
       onCheck (o) {
-        if(this.checkStrictly){
-          this.checkedKeys = o.checked;
-        }else{
-          this.checkedKeys = o
-        }
+        this.checkedKeys = this.checkStrictly ? o.checked : o
       },
-      show(roleId){
-        this.roleId=roleId
-        this.visible = true;
+      show (roleId) {
+        this.roleId = roleId
+        this.visible = true
       },
       close () {
         this.reset()
-        this.$emit('close');
-        this.visible = false;
+        this.$emit('close')
+        this.visible = false
       },
-      onExpand(expandedKeys){
-        this.expandedKeysss = expandedKeys;
+      onExpand (expandedKeys) {
+        this.expandedKeysss = expandedKeys
         this.autoExpandParent = false
       },
       reset () {
@@ -116,37 +110,35 @@
         this.checkedKeys = this.allTreeKeys
       },
       cancelCheckALL () {
-        //this.checkedKeys = this.defaultCheckedKeys
         this.checkedKeys = []
       },
       switchCheckStrictly (v) {
-        if(v==1){
+        if (v === 1) {
           this.checkStrictly = false
-        }else if(v==2){
+        } else if (v === 2) {
           this.checkStrictly = true
         }
       },
       handleCancel () {
         this.close()
       },
-      handleSubmit(){
-        let that = this;
-        let params =  {
-          roleId:that.roleId,
-          permissionIds:that.checkedKeys.join(","),
-          lastpermissionIds:that.defaultCheckedKeys.join(","),
-        };
-        that.loading = true;
-        console.log("请求参数：",params);
+      handleSubmit () {
+        let that = this
+        let params = {
+          roleId: that.roleId,
+          permissionIds: that.checkedKeys.join(','),
+          lastpermissionIds: that.defaultCheckedKeys.join(','),
+        }
+        that.loading = true
         saveRolePermission(params).then((res)=>{
-          if(res.success){
-            that.$message.success(res.message);
-            that.loading = false;
-            that.close();
-          }else {
-            that.$message.error(res.message);
-            that.loading = false;
-            that.close();
+          if (res.success) {
+            that.$message.success(res.message)
+            that.loading = false
+            that.close()
+          } else {
+            that.$message.error(res.message)
+            that.loading = false
+            that.close()
           }
         })
       },
@@ -154,14 +146,15 @@
   watch: {
     visible () {
       if (this.visible) {
-        queryTreeListForRole().then((res) => {
+        queryPermissionTreeList().then((res) => {
           this.treeData = res.result.treeList
           this.allTreeKeys = res.result.ids
-          queryRolePermission({roleId:this.roleId}).then((res)=>{
-              this.checkedKeys = [...res.result];
-              this.defaultCheckedKeys = [...res.result];
-              this.expandedKeysss = this.allTreeKeys;
-              //console.log(this.defaultCheckedKeys)
+          queryRolePermission({
+            roleId: this.roleId
+          }).then((res) => {
+            this.checkedKeys = [...res.result]
+            this.defaultCheckedKeys = [...res.result]
+            this.expandedKeysss = this.allTreeKeys
           })
         })
       }
@@ -170,7 +163,7 @@
   }
 
 </script>
-<style lang="scss" scoped>
+<style lang="less" scoped>
   .drawer-bootom-button {
     position: absolute;
     bottom: 0;

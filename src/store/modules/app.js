@@ -9,15 +9,16 @@ import {
   DEFAULT_FIXED_SIDEMENU,
   DEFAULT_FIXED_HEADER_HIDDEN,
   DEFAULT_CONTENT_WIDTH_TYPE,
-  DEFAULT_MULTI_PAGE
-} from "@/store/mutation-types"
+  DEFAULT_MULTI_TAB,
+  DEFAULT_FIXED_MULTITAB,
+  SYSTEM_SETTING
+} from '@/store/mutation-types'
+
+import { getSystemConfig } from '@/api/system'
 
 const app = {
   state: {
-    sidebar: {
-      opened: true,
-      withoutAnimation: false
-    },
+    sidebar: true,
     device: 'desktop',
     theme: '',
     layout: '',
@@ -27,17 +28,18 @@ const app = {
     autoHideHeader: false,
     color: null,
     weak: false,
-    multipage: true //默认多页签模式
+    multiTab: true,
+    fixedMultiTab: false,
+    setting: {}
   },
   mutations: {
     SET_SIDEBAR_TYPE: (state, type) => {
-      state.sidebar.opened = type
+      state.sidebar = type
       Vue.ls.set(SIDEBAR_TYPE, type)
     },
-    CLOSE_SIDEBAR: (state, withoutAnimation) => {
+    CLOSE_SIDEBAR: (state) => {
       Vue.ls.set(SIDEBAR_TYPE, true)
-      state.sidebar.opened = false
-      state.sidebar.withoutAnimation = withoutAnimation
+      state.sidebar = false
     },
     TOGGLE_DEVICE: (state, device) => {
       state.device = device
@@ -75,50 +77,69 @@ const app = {
       Vue.ls.set(DEFAULT_COLOR_WEAK, flag)
       state.weak = flag
     },
-    SET_MULTI_PAGE (state, multipageFlag) {
-      Vue.ls.set(DEFAULT_MULTI_PAGE, multipageFlag)
-      state.multipage = multipageFlag
+    TOGGLE_MULTI_TAB: (state, bool) => {
+      Vue.ls.set(DEFAULT_MULTI_TAB, bool)
+      state.multiTab = bool
+    },
+    TOGGLE_FIXED_MULTITAB: (state, bool) => {
+      Vue.ls.set(DEFAULT_FIXED_MULTITAB, bool)
+      state.fixedMultiTab = bool
+    },
+    GET_SYSTEM_SETTING: (state, setting) => {
+      window.localStorage.setItem(SYSTEM_SETTING, setting)
+      state.setting = setting
     }
   },
   actions: {
-    setSidebar: ({ commit }, type) => {
+    setSidebar ({ commit }, type) {
       commit('SET_SIDEBAR_TYPE', type)
     },
-    CloseSidebar({ commit }, { withoutAnimation }) {
-      commit('CLOSE_SIDEBAR', withoutAnimation)
+    CloseSidebar ({ commit }) {
+      commit('CLOSE_SIDEBAR')
     },
-    ToggleDevice({ commit }, device) {
+    ToggleDevice ({ commit }, device) {
       commit('TOGGLE_DEVICE', device)
     },
-    ToggleTheme({ commit }, theme) {
+    ToggleTheme ({ commit }, theme) {
       commit('TOGGLE_THEME', theme)
     },
-    ToggleLayoutMode({ commit }, mode) {
+    ToggleLayoutMode ({ commit }, mode) {
       commit('TOGGLE_LAYOUT_MODE', mode)
     },
-    ToggleFixedHeader({ commit }, fixedHeader) {
+    ToggleFixedHeader ({ commit }, fixedHeader) {
       if (!fixedHeader) {
         commit('TOGGLE_FIXED_HEADER_HIDDEN', false)
       }
       commit('TOGGLE_FIXED_HEADER', fixedHeader)
     },
-    ToggleFixSiderbar({ commit }, fixSiderbar) {
-      commit( 'TOGGLE_FIXED_SIDERBAR', fixSiderbar)
+    ToggleFixSiderbar ({ commit }, fixSiderbar) {
+      commit('TOGGLE_FIXED_SIDERBAR', fixSiderbar)
     },
-    ToggleFixedHeaderHidden({ commit }, show) {
+    ToggleFixedHeaderHidden ({ commit }, show) {
       commit('TOGGLE_FIXED_HEADER_HIDDEN', show)
     },
-    ToggleContentWidth({ commit }, type) {
+    ToggleContentWidth ({ commit }, type) {
       commit('TOGGLE_CONTENT_WIDTH', type)
     },
-    ToggleColor({ commit }, color) {
+    ToggleColor ({ commit }, color) {
       commit('TOGGLE_COLOR', color)
     },
-    ToggleWeak({ commit }, weakFlag) {
+    ToggleWeak ({ commit }, weakFlag) {
       commit('TOGGLE_WEAK', weakFlag)
     },
-    ToggleMultipage({ commit }, multipageFlag) {
-      commit('SET_MULTI_PAGE', multipageFlag)
+    ToggleMultiTab ({ commit }, bool) {
+      commit('TOGGLE_MULTI_TAB', bool)
+    },
+    ToggleFixedMultiTab ({ commit }, bool) {
+      commit('TOGGLE_FIXED_MULTITAB', bool)
+    },
+    GetSystemSetting ({ commit }) {
+      return new Promise((resolve, reject) => {
+        getSystemConfig().then(response => {
+          commit('GET_SYSTEM_SETTING', response.success ? response.result : '\'{}\'')
+          resolve(response)
+        }).catch(reject)
+      })
     }
   }
 }

@@ -13,8 +13,8 @@
           padding:'10px',
           border: '1px solid #e9e9e9',
           background: '#fff',
-        }">
-
+        }"
+      >
         <div class="table-page-search-wrapper">
           <a-form layout="inline" :form="form">
             <a-row :gutter="10">
@@ -35,10 +35,10 @@
                 </a-form-item>
               </a-col>
               <a-col :md="7" :sm="24">
-              <span style="float: left;" class="table-page-search-submitButtons">
-                <a-button type="primary" @click="searchQuery">搜索</a-button>
-                <a-button type="primary" @click="searchReset" style="margin-left: 8px">重置</a-button>
-              </span>
+                <span style="float: left;" class="table-page-search-submitButtons">
+                  <a-button type="primary" @click="searchQuery">搜索</a-button>
+                  <a-button type="primary" @click="searchReset" style="margin-left: 8px">重置</a-button>
+                </span>
               </a-col>
             </a-row>
             <a-row>
@@ -60,14 +60,13 @@
             @change="handleTableChange"
           >
 
-          <span slot="action" slot-scope="text, record">
-            <a @click="handleEdit(record)">编辑</a>
-            <a-divider type="vertical"/>
-            <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
-              <a>删除</a>
-            </a-popconfirm>
-          </span>
-
+            <span slot="action" slot-scope="text, record">
+              <a @click="handleEdit(record)">编辑</a>
+              <a-divider type="vertical" />
+              <a-popconfirm title="确定删除吗?" @confirm="() => handleDelete(record.id)">
+                <a>删除</a>
+              </a-popconfirm>
+            </span>
           </a-table>
         </div>
       </div>
@@ -78,46 +77,46 @@
 
 <script>
   import pick from 'lodash.pick'
-  import {filterObj} from '@/utils/util';
+  import {filterObj} from '@/utils/util'
+  import { ProListMixin } from '@/utils/mixins/ProListMixin'
   import DictItemModal from './modules/DictItemModal'
-  import {JeecgListMixin} from '@/mixins/JeecgListMixin'
 
   export default {
-    name: "DictItemList",
-    mixins: [JeecgListMixin],
-    components: {DictItemModal},
+    name: 'DictItemList',
+    mixins: [ ProListMixin ],
+    components: { DictItemModal },
     data() {
       return {
         columns: [
           {
             title: '名称',
-            align: "center",
+            align: 'center',
             dataIndex: 'itemText',
           },
           {
             title: '数据值',
-            align: "center",
+            align: 'center',
             dataIndex: 'itemValue',
           },
           {
             title: '操作',
             dataIndex: 'action',
-            align: "center",
+            align: 'center',
             scopedSlots: {customRender: 'action'},
           }
         ],
         queryParam: {
-          dictId: "",
-          dictName: "",
-          itemText: "",
-          delFlag: "1",
+          dictId: '',
+          dictName: '',
+          itemText: '',
+          delFlag: '1',
           status: [],
         },
-        title: "操作",
+        title: '操作',
         visible: false,
         screenWidth: 800,
         model: {},
-        dictId: "",
+        dictId: '',
         status: 1,
         labelCol: {
           xs: {span: 5},
@@ -133,71 +132,65 @@
           itemValue: {rules: [{required: true, message: '请输入数据值!'}]},
         },
         url: {
-          list: "/sys/dictItem/list",
-          delete: "/sys/dictItem/delete",
-          deleteBatch: "/sys/dictItem/deleteBatch",
+          list: '/sys/dictItem/list',
+          delete: '/sys/dictItem/delete',
+          deleteBatch: '/sys/dictItem/deleteBatch',
         },
       }
     },
     created() {
       // 当页面初始化时,根据屏幕大小来给抽屉设置宽度
-      this.resetScreenSize();
+      this.resetScreenSize()
     },
     methods: {
       add(dictId) {
-        this.dictId = dictId;
-        this.edit({});
+        this.dictId = dictId
+        this.edit({})
       },
       edit(record) {
         if (record.id) {
-          this.dictId = record.id;
+          this.dictId = record.id
         }
         this.queryParam = {}
-        this.form.resetFields();
-        this.model = Object.assign({}, record);
-        this.model.dictId = this.dictId;
-        this.model.status = this.status;
-        this.visible = true;
+        this.form.resetFields()
+        this.model = Object.assign({}, record)
+        this.model.dictId = this.dictId
+        this.model.status = this.status
+        this.visible = true
         this.$nextTick(() => {
           this.form.setFieldsValue(pick(this.model, 'itemText', 'itemValue'))
         });
         // 当其它模块调用该模块时,调用此方法加载字典数据
-        this.loadData();
+        this.loadData()
       },
 
       getQueryParams() {
-        var param = Object.assign({}, this.queryParam);
-        param.dictId = this.dictId;
-        param.field = this.getQueryField();
-        param.pageNo = this.ipagination.current;
-        param.pageSize = this.ipagination.pageSize;
-        return filterObj(param);
+        var param = Object.assign({}, this.queryParam)
+        param.dictId = this.dictId
+        param.field = this.getQueryField()
+        param.pageNo = this.ipagination.current
+        param.pageSize = this.ipagination.pageSize
+        return filterObj(param)
       },
 
       // 添加字典数据
       handleAdd() {
-        this.$refs.modalForm.add(this.dictId);
-        this.$refs.modalForm.title = "新增";
+        this.$refs.modalForm.add(this.dictId)
+        this.$refs.modalForm.title = '新增'
       },
       showDrawer() {
         this.visible = true
       },
       onClose() {
         this.visible = false
-        this.form.resetFields();
-        this.dataSource = [];
+        this.form.resetFields()
+        this.dataSource = []
       },
       // 抽屉的宽度随着屏幕大小来改变
       resetScreenSize() {
-        let screenWidth = document.body.clientWidth;
-        if (screenWidth < 600) {
-          this.screenWidth = screenWidth;
-        } else {
-          this.screenWidth = 600;
-        }
+        let screenWidth = document.body.clientWidth
+        this.screenWidth = screenWidth < 600 ? screenWidth : 600
       },
     }
   }
 </script>
-<style scoped>
-</style>

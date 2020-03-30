@@ -1,6 +1,5 @@
 <template>
   <a-card :bordered="false">
-
     <!-- 左侧面板 -->
     <div class="table-page-search-wrapper">
       <a-form layout="inline">
@@ -40,15 +39,16 @@
         :dataSource="dataSource"
         :pagination="ipagination"
         :loading="loading"
-        @change="handleTableChange">
+        @change="handleTableChange"
+      >
         <span slot="action" slot-scope="text, record">
           <a @click="handleEdit(record)">
-            <a-icon type="edit"/>
+            <a-icon type="edit" />
             编辑
           </a>
-          <a-divider type="vertical"/>
-          <a @click="editDictItem(record)"><a-icon type="setting"/> 字典配置</a>
-          <a-divider type="vertical"/>
+          <a-divider type="vertical" />
+          <a @click="editDictItem(record)"><a-icon type="setting" /> 字典配置</a>
+          <a-divider type="vertical" />
           <a-popconfirm title="确定删除吗?" @confirm="() =>handleDelete(record.id)">
             <a>删除</a>
           </a-popconfirm>
@@ -63,22 +63,22 @@
 
 <script>
   import { filterObj } from '@/utils/util';
-  import { JeecgListMixin } from '@/mixins/JeecgListMixin'
+  import { ProListMixin } from '@/utils/mixins/ProListMixin'
   import DictModal from './modules/DictModal'
   import DictItemList from './DictItemList'
 
   export default {
-    name: "DictList",
-    mixins:[JeecgListMixin],
-    components: {DictModal, DictItemList},
-    data() {
+    name: 'DictList',
+    mixins:[ ProListMixin ],
+    components: { DictModal, DictItemList },
+    data () {
       return {
         description: '这是数据字典页面',
         visible: false,
         // 查询条件
         queryParam: {
-          dictCode: "",
-          dictName: "",
+          dictCode: '',
+          dictName: '',
         },
         // 表头
         columns: [
@@ -87,24 +87,24 @@
             dataIndex: '',
             key: 'rowIndex',
             width: 120,
-            align: "center",
+            align: 'center',
             customRender: function (t, r, index) {
               return parseInt(index) + 1;
             }
           },
           {
             title: '字典名称',
-            align: "left",
+            align: 'left',
             dataIndex: 'dictName',
           },
           {
             title: '字典编号',
-            align: "left",
+            align: 'left',
             dataIndex: 'dictCode',
           },
           {
             title: '描述',
-            align: "left",
+            align: 'left',
             dataIndex: 'description',
           },
           {
@@ -114,7 +114,7 @@
             scopedSlots: {customRender: 'action'},
           }
         ],
-        dict: "",
+        dict: '',
         labelCol: {
           xs: {span: 8},
           sm: {span: 5},
@@ -124,42 +124,42 @@
           sm: {span: 19},
         },
         url: {
-          list: "/sys/dict/list",
-          delete: "/sys/dict/delete",
-          exportXlsUrl: "sys/dict/exportXls",
-          importExcelUrl: "sys/dict/importExcel",
+          list: '/sys/dict/list',
+          delete: '/sys/dict/delete',
+          exportXlsUrl: 'sys/dict/exportXls',
+          importExcelUrl: 'sys/dict/importExcel',
         },
       }
     },
     computed: {
-      importExcelUrl: function () {
-        return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`;
+      importExcelUrl () {
+        return `${window._CONFIG['domianURL']}/${this.url.importExcelUrl}`
       }
     },
     methods: {
-      getQueryParams() {
-        var param = Object.assign({}, this.queryParam, this.isorter);
-        param.field = this.getQueryField();
-        param.pageNo = this.ipagination.current;
-        param.pageSize = this.ipagination.pageSize;
-        return filterObj(param);
+      getQueryParams () {
+        const param = Object.assign({}, this.queryParam, this.isorter)
+        param.field = this.getQueryField()
+        param.pageNo = this.ipagination.current
+        param.pageSize = this.ipagination.pageSize
+        return filterObj(param)
       },
       //取消选择
-      cancelDict() {
-        this.dict = "";
-        this.visible = false;
-        this.loadData();
+      cancelDict () {
+        this.dict = ''
+        this.visible = false
+        this.loadData()
       },
       //编辑字典数据
-      editDictItem(record) {
-        this.$refs.dictItemList.edit(record);
+      editDictItem (record) {
+        this.$refs.dictItemList.edit(record)
       },
       // 重置字典类型搜索框的内容
       searchReset() {
-        var that = this;
-        that.queryParam.dictName = "";
-        that.queryParam.dictCode = "";
-        that.loadData(this.ipagination.current);
+        const that = this
+        that.queryParam.dictName = ''
+        that.queryParam.dictCode = ''
+        that.loadData(this.ipagination.current)
       },
     },
     watch: {
@@ -169,6 +169,3 @@
     },
   }
 </script>
-<style scoped>
-  @import '~@assets/less/common.less'
-</style>

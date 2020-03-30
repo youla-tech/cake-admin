@@ -1,16 +1,12 @@
-<template>
-  <div>
-    <router-view />
-  </div>
-</template>
-
 <script>
-
-  export default {
-    name: "BlankLayout",
+export default {
+  name: 'BlankLayout',
+  render () {
+    return (
+      <div>
+        <router-view />
+      </div>
+    )
   }
+}
 </script>
-
-<style scoped>
-
-</style>

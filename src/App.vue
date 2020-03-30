@@ -1,41 +1,26 @@
 <template>
   <a-locale-provider :locale="locale">
     <div id="app">
-      <router-view/>
+      <router-view />
     </div>
   </a-locale-provider>
 </template>
+
 <script>
-  import zhCN from 'ant-design-vue/lib/locale-provider/zh_CN'
-  import enquireScreen from '@/utils/device'
+import zhCN from 'ant-design-vue/lib/locale-provider/zh_CN'
+import { AppDeviceEnquire } from '@/utils/mixin'
 
-  export default {
-    data () {
-      return {
-        locale: zhCN,
-      }
-    },
-    created () {
-      let that = this
-      enquireScreen(deviceType => {
-        // tablet
-        if (deviceType === 0) {
-          that.$store.commit('TOGGLE_DEVICE', 'mobile')
-          that.$store.dispatch('setSidebar', false)
-        }
-        // mobile
-        else if (deviceType === 1) {
-          that.$store.commit('TOGGLE_DEVICE', 'mobile')
-          that.$store.dispatch('setSidebar', false)
-        }
-        else {
-          that.$store.commit('TOGGLE_DEVICE', 'desktop')
-          that.$store.dispatch('setSidebar', true)
-        }
-
-      })
+export default {
+  mixins: [ AppDeviceEnquire ],
+  data () {
+    return {
+      locale: zhCN
     }
+  },
+  mounted () {
+
   }
+}
 </script>
 <style>
   #app {

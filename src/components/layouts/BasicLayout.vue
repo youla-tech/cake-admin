@@ -1,39 +1,37 @@
 <template>
   <global-layout>
+    <multi-tab v-if="!isMobile() && multiTab" :class="this.fixedMultiTab && 'ant-multitab-fixedMultiTab'" :isHomeTabFix="tabConfig.fix" :homeIndex="tabConfig.index"></multi-tab>
     <transition name="page-transition">
-      <keep-alive v-if="keepAlive">
-        <router-view />
-      </keep-alive>
-      <router-view v-else />
+      <IRouteView :style="{'margin-top': !isMobile() && this.fixedMultiTab ? '41px' : '0'}" />
     </transition>
   </global-layout>
 </template>
 
 <script>
-  import GlobalLayout from '@/components/page/GlobalLayout'
+import GlobalLayout from '@/components/Base/GlobalLayout'
+import IRouteView from '@layout/RouteView'
+import { mixin, mixinDevice } from '@/utils/mixin'
+import config from '@/config/defaultSettings'
 
-  export default {
-    name: "BasicLayout",
-    components: {
-      GlobalLayout
-    },
-    data () {
-      return {
-
+export default {
+  name: 'BasicLayout',
+  mixins: [ mixin, mixinDevice ],
+  components: {
+    GlobalLayout,
+    IRouteView
+  },
+  data () {
+    return {
+      tabConfig: {
+        fix: config.routerOptions.isStaticHomeTab,
+        index: config.routerOptions.index
       }
-    },
-    computed: {
-      keepAlive () {
-        return this.$route.meta.keepAlive
-      }
-    },
-    methods: {
-
-    },
+    }
   }
+}
 </script>
 
-<style lang="scss">
+<style lang="less">
 
   /*
  * The following styles are auto-applied to elements with
