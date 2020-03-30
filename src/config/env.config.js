@@ -1,6 +1,6 @@
 const envConfig = {
   dev: {
-    baseApi: 'http://localhost:9000/jeecg-boot'
+    baseApi: 'http://localhost:9100/jeecg-boot'
   },
   prod: {
     // baseApi: 'https://192.168.200.254'

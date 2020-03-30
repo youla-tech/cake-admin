@@ -129,9 +129,6 @@ export default {
   created () {
     Vue.ls.remove(ACCESS_TOKEN)
     this.getRouterData();
-    // update-begin- --- author:scott ------ date:20190805 ---- for:密码加密逻辑暂时注释掉，有点问题
-    //this.getEncrypte();
-    // update-end- --- author:scott ------ date:20190805 ---- for:密码加密逻辑暂时注释掉，有点问题
   },
   methods: {
     ...mapActions([ "Login", "Logout","PhoneLogin" ]),
