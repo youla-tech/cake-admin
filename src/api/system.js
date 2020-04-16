@@ -1,4 +1,6 @@
-import { getAction, postAction, putAction } from '@/utils/ajax'
+import { getAction, postAction, putAction, getRequestUrl } from '@/utils/ajax'
+
+const getGraphicCode = () => getRequestUrl('/sys/captcha', {t: new Date().getTime()})
 
 ////// Menu
 const getMenuList = (params) => getAction('/sys/menu/list', params)
@@ -103,5 +105,6 @@ export {
   queryAnnouncementDetail,
 
   // System
-  getSystemConfig
+  getSystemConfig,
+  getGraphicCode
 }
